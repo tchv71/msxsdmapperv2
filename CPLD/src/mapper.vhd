@@ -11,7 +11,7 @@
 -- SATISFACTORY QUALITY AND FITNESS FOR A PARTICULAR PURPOSE.
 -- Please see the CERN OHL v.1.1 for applicable conditions
 
--- Implementa uma mapper padrao de 512K para SRAM
+-- Implements a standard 512K mapper for SRAM.
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -20,14 +20,14 @@ use ieee.std_logic_unsigned.all;
 entity mapper is
 	port(
 		reset_n_i	: in    std_logic;								-- /RESET
-		cpu_a_i		: in    std_logic_vector(15 downto 0);		-- Barramento de enderecos da CPU
-		cpu_d_io		: inout std_logic_vector(7 downto 0);		-- Barramento de dados da CPU
-		ioFx_i		: in    std_logic;								-- Sinal de selecao de I/O portas FC a FF
-		cpu_rd_n_i	: in    std_logic;								-- /RD da CPU
-		cpu_wr_n_i	: in    std_logic;								-- /WR da CPU
-		sltsl_n_i	: in    std_logic;								-- /SLTSL do slot/subslot da RAM
-		sram_ma_o	: out   std_logic_vector(5 downto 0);		-- Saida do banco da SRAM
-		sram_cs_n_o	: out   std_logic;								-- Saida de selecao da SRAM
+		cpu_a_i		: in    std_logic_vector(15 downto 0);		-- CPU Address Bus
+		cpu_d_io		: inout std_logic_vector(7 downto 0);		-- CPU data bus
+		ioFx_i		: in    std_logic;								-- I/O selection signal for FC to FF ports
+		cpu_rd_n_i	: in    std_logic;								-- /RD from CPU
+		cpu_wr_n_i	: in    std_logic;								-- /WR from CPU
+		sltsl_n_i	: in    std_logic;								-- /SLTSL from slot/subslot from RAM
+		sram_ma_o	: out   std_logic_vector(5 downto 0);		-- SRAM bank exit
+		sram_cs_n_o	: out   std_logic;								-- SRAM selection output
 		sram_we_n_o	: out   std_logic;
 		busdir_n_o	: out   std_logic
 	);
@@ -55,7 +55,7 @@ begin
 	process(reset_n_i, mp_wr_s)
 	begin
 		if reset_n_i = '0' then
-			MapBank0_q   <= "00011";		-- Reset configura blocos padroes da mapper
+			MapBank0_q   <= "00011";		-- Reset configures mapper blocks
 			MapBank1_q   <= "00010";
 			MapBank2_q   <= "00001";
 			MapBank3_q   <= "00000";
@@ -70,7 +70,7 @@ begin
 		end if;
 	end process;
 
-	-- Leitura dos registros da mapper pelas portas
+	-- Reading mapper records through ports
 	cpu_d_io(4 downto 0) <=
 			(others => 'Z') when cpu_rd_n_i = '1' or ioFx_i = '0' else
 	      MapBank0_q when cpu_a_i(1 downto 0) = "00" else
@@ -78,13 +78,13 @@ begin
 	      MapBank2_q when cpu_a_i(1 downto 0) = "10" else
 	      MapBank3_q;
 
-	-- Gera endereco da SRAM de acordo com endereco do barramento e bancos configurados
+	-- Generates SRAM address based on configured bus address and memory banks
 	ram_ma_s	<= MapBank0_q when cpu_a_i(15 downto 14) = "00" else
 					MapBank1_q when cpu_a_i(15 downto 14) = "01" else
 					MapBank2_q when cpu_a_i(15 downto 14) = "10" else
 					MapBank3_q;
 
-	-- Pega parte baixa do endereco que vai direto nos pinos da SRAM
+	-- It takes the lower part of the address that goes directly to the SRAM pins
 	sram_ma_o <= ram_ma_s & cpu_a_i(13);
 
 	sram_cs_n_o <= sltsl_n_i;
