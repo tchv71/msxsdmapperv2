@@ -11,7 +11,7 @@
 -- SATISFACTORY QUALITY AND FITNESS FOR A PARTICULAR PURPOSE.
 -- Please see the CERN OHL v.1.1 for applicable conditions
 
--- Implementa um expansor de slots padrao.
+-- Implements a standard slot expander.
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -20,13 +20,13 @@ use ieee.std_logic_unsigned.all;
 entity exp_slot is
 	port(
 		reset_n	: in    std_logic;								-- /RESET
-		sltsl_n	: in    std_logic;								-- Sinal de selecao do slot a ser expandido
-		cpu_rd_n	: in    std_logic;								-- /RD da CPU
-		cpu_wr_n	: in    std_logic;								-- /WR da CPU
-		ffff		: in    std_logic;								-- 1 quando CPU_A = FFFF
-		cpu_a		: in    std_logic_vector(15 downto 14);	-- Barramento de endereco da CPU (bits 15 e 14)
-		cpu_d		: inout std_logic_vector(7 downto 0);		-- Barramento de dados da CPU
-		exp_n		: out   std_logic_vector(3 downto 0)		-- Saida 4 bits do expansor (ativo em 0)
+		sltsl_n	: in    std_logic;								-- Signal indicating the slot to be expanded
+		cpu_rd_n	: in    std_logic;							-- /RD from CPU
+		cpu_wr_n	: in    std_logic;							-- /WR from CPU
+		ffff		: in    std_logic;							-- 1 when CPU_A = FFFF
+		cpu_a		: in    std_logic_vector(15 downto 14);		-- CPU address bus (bits 15 and 14)
+		cpu_d		: inout std_logic_vector(7 downto 0);		-- CPU data bus
+		exp_n		: out   std_logic_vector(3 downto 0)		-- Output 4 bits from the expander (active at 0)
 	);
 end exp_slot;
 
@@ -39,24 +39,24 @@ architecture rtl of exp_slot is
 
 begin
 
-	-- Sinais de selecao do slot
+	-- Slot selection signals
 	exp_wr <= '1' when sltsl_n = '0' and cpu_wr_n = '0' and ffff = '1'	else '0';
 	exp_rd <= '1' when sltsl_n = '0' and cpu_rd_n = '0' and ffff = '1'	else '0';
 
 	process(reset_n, exp_wr)
 	begin
-		if (reset_n = '0') then				-- Zerar registrador do expansor em um reset
+		if (reset_n = '0') then				-- Resetting the expander register
 			exp_reg <= X"00";
-		elsif (falling_edge(exp_wr)) then	-- Escrita no endereco &HFFFF
+		elsif (falling_edge(exp_wr)) then	-- Written not corrected &HFFFF
 			exp_reg <= cpu_d;
 		end if;
  	end process;
 
-	-- Leitura dos registros
+	-- Reading the registers
 	cpu_d <= (not exp_reg) when exp_rd = '1' else
 				(OTHERS => 'Z');
 
-	-- Seleciona qual subslot acionar de acordo com endereco do barramento e registros
+	-- Select which subslot to activate based on the bus address and registers
 	with cpu_a(15 downto 14) select exp_sel <=
 		exp_reg(1 downto 0) when "00",
 		exp_reg(3 downto 2) when "01",
