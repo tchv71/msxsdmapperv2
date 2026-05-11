@@ -1,33 +1,31 @@
-
 01/01/2020:
-Tirado porta I/O criada para atualização. Modificado forma de atualização para ASCII16 padrão.
-Frame 1 para leitura da Flash, Frame 2 para leitura e escrita somente se banco > 7.
-Adicionado detecção do disk change.
-Melhorado modo assíncrono da porta SPI.
-Registro para seleção dos bancos das páginas agora é decodificado completo, 6000h e 7000h.
-Janela SPI sempre ativa agora.
-Mudado registros:
- - Para acesso aos dados do SPI a janela é 7B00h a 7EFFh.
- - Para controle e status é 7F00h
-Mudado forma de seleção do cartão atual, bits 1 e 0 do registro 7F00h seleciona cartão:
- - "00" não seleciona nenhum;
- - "01" seleciona 1º cartão;
- - "10" seleciona 2º cartão.
-Para ler status, depende do cartão selecionado, se nenhum lê status das chaves externas, se algum 
- selecionado lê status do disk change, cartão inserido e proteção contra escrita.
+Removed I/O port created for updates. Modified update method to standard ASCII16.
+Frame 1 for Flash reading; Frame 2 for reading and writing (only if bank > 7).
+Added disk change detection.
+Improved SPI port asynchronous mode.
+The register for selecting page banks is now fully decoded (6000h and 7000h).
+The SPI window is now always active.
+Changed registers:
+- For SPI data access, the window is 7B00h to 7EFFh. 
+- For control and status, it is 7F00h.
+Changed current card selection method: bits 1 and 0 of register 7F00h select the card:
+- "00" selects no card; 
+- "01" selects the 1st card; 
+- "10" selects the 2nd card.
+To read status: depends on the selected card. If no card is selected, it reads the status of the external switches; if a card is selected, it reads the status of the disk change, card insertion, and write protection.
 
 
 04/11/2014:
-  Atualizado versão no Nextor para 2.0.4
+Updated Nextor version to 2.0.4.
 
 06/07/2014:
-  Alterado lógica do CPLD para porta SPI trabalhar assincronicamente. Não
-é mais necessário depender do clock do barramento.
+Altered CPLD logic to allow the SPI port to operate asynchronously. It is no
+longer necessary to rely on the bus clock.
 
 15/01/2014:
-  Adicionado circuito da Megaram (by Ademir Carchano) e uma chave para poder
-selecionar se a interface irá implementar uma Mapper ou uma Megaram.
-  Layout da PCB desenhado pelo Luciano Sturaro.
+Added MegaRAM circuitry (by Ademir Carchano) and a switch to select
+whether the interface implements a Mapper or a MegaRAM. 
+PCB layout designed by Luciano Sturaro.
 
 02/01/2014:
-  Primeira versão.
+First version.
