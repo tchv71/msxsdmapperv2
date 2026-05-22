@@ -15,19 +15,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-CP = cp
-RM = rm -f
+CP = copy #cp
+RM = del /Q #rm -f
 MD = mkdir
 CC = sdcc
 AS = sdasz80
 LD = sdcc
 
 SDIR = src
-LDIR = ../msxclib/lib
-IDIR = ../msxclib/inc
+LDIR = ../msxclib2/lib
+IDIR = ../msxclib2/inc
 ODIR = obj
 
-CFLAGS = -mz80 --disable-warning 85 --opt-code-size --fomit-frame-pointer -I$(IDIR) -Iinc -I..
+CFLAGS = -mz80  --disable-warning 85 --opt-code-size --fomit-frame-pointer -I$(IDIR) -Iinc -I.. #--sdcccall 0
 AFLAGS = -Iinc -I..
 LDFLAGS = -mz80 --code-loc 0x0180 --data-loc 0 --no-std-crt0
 
@@ -49,7 +49,7 @@ $(program1).COM: $(OBJS)
 .PHONY: clean dir
 
 clean:
-	$(RM) $(ODIR)/* *.map *.lk *.noi *.COM *.ihx
+	$(RM) $(ODIR)\*.* *.map *.lk *.noi *.COM *.ihx
 
 $(ODIR):
 	-$(MD) $(ODIR)
@@ -59,6 +59,9 @@ $(ODIR)/%.rel: $(SDIR)/%.s
 
 $(ODIR)/%.rel: $(SDIR)/%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
+
+$(ODIR)/bios.rel: $(LDIR)/bios.c
+	$(CC) $(CFLAGS) --sdcccall 1 -c -o $@ $<
 
 $(ODIR)/%.rel: $(LDIR)/%.s
 	$(AS) $(AFLAGS) -o $@ $<
