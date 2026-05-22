@@ -72,6 +72,9 @@ static unsigned char flashIdent(unsigned char manId, unsigned char prodId)
 		} else if (prodId == 0xB6) {	// SST39SF020
 			alg = ALGBYTE;
 			return 1;
+		} else if (prodId == 0xB7) {	// SST39SF040
+			alg = ALGBYTE;
+			return 1;
 		}
 	} else if (manId == 0xDA) {			// Winbond
 		if (prodId == 0x0B) {			// W49F002UN
