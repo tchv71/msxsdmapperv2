@@ -59,7 +59,7 @@ begin
 			MapBank1_q   <= "00010";
 			MapBank2_q   <= "00001";
 			MapBank3_q   <= "00000";
-		elsif rising_edge(mp_wr_s) then
+		elsif falling_edge(mp_wr_s) then
 			case cpu_a_i(1 downto 0) is
 				when "00"   => MapBank0_q <= cpu_d_io(4 downto 0);
 				when "01"   => MapBank1_q <= cpu_d_io(4 downto 0);

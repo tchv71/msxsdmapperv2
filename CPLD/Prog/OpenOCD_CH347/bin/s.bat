@@ -1,0 +1,1 @@
+openocd.exe -f ch347.cfg -c "svf sdmapper.svf;shutdown"
